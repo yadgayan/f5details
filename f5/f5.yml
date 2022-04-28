@@ -1,0 +1,41 @@
+---
+
+- hosts: F5
+  gather_facts: false
+  connection: local
+
+  vars:
+    command_list:
+        - show sys version
+        - list auth user | grep auth
+        - show sys clock
+        - list /ltm data-group internal CName_DG499
+  tasks:
+  - name: Run command
+    bigip_command:
+      provider:
+          server: 192.168.23.200
+          user: "{{ ansible_user }}"
+          password: "{{ ansible_password }}"
+          server_port: 443
+          validate_certs: false
+      commands: "{{ command_list }}"
+#        - show sys version
+#        - list auth user | grep auth
+#        - show sys clock
+#        - list /ltm data-group internal CName_DG499
+      chdir: B_3333
+    register: result
+
+  - debug: msg="{{result.stdout_lines}}"
+
+  - name: copy the output to a local file
+    copy:
+      content: "{{ result.stdout[0] }}"
+      dest: "/tmp/F5_details.txt"
+    delegate_to: localhost
+
+#  - name: "Put all output together into one nice text file"
+#    template:
+#        src: message.j2
+#        dest: "/tmp/F5_details.txt"
