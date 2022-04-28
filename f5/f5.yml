@@ -6,9 +6,9 @@
 
   vars:
     command_list:
-        - show sys version
-        - list auth user | grep auth
-        - show sys clock
+#        - show sys version
+#        - list auth user | grep auth
+#        - show sys clock
         - list /ltm data-group internal CName_DG499
   tasks:
   - name: Run command
