@@ -1,9 +1,9 @@
 [F5]
 myf5 ansible_host=192.168.23.200
-myf5 ansible_host=192.168.23.201
+
 
 [F5:vars]
-ansible_srv=192.168.23.200
+ansible_srv= 192.168.23.200
 ansible_user= root
 ansible_password= Auckland@123
 ansible_partition= B_3333
