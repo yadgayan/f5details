@@ -1,0 +1,18 @@
+## -prod  : DG_INREWN_HTTS001_Valid_Cert_CName
+
+## -xzt   : DG_INREWN_HTTS008_Valid_Cert_CName
+## -test3 : DG_INREWN_HTTS013_Valid_Cert_CName
+
+## -xzs   : DG_INREWN_HTTS009_Valid_Cert_CName
+## -test4 : DG_INREWN_HTTS014_Valid_Cert_CName
+## -psup  : DG_INREWN_HTTS010_Valid_Cert_CName
+## -qual  : DG_INREWN_HTTS001_Valid_Cert_CName
+
+CName details for : {{ inventory_hostname }} 
+
+{% for cmd in command_list %}
+############ {{ cmd }} ################
+
+{{ result.stdout[loop.index0] }}
+
+{% endfor %}

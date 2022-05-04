@@ -1,0 +1,24 @@
+---
+
+- name: run command in asa
+  connection: network_cli
+  gather_facts: false
+  hosts: taasdevices
+
+  tasks:
+    - name: run command {{ cmd }}
+      asa_command:
+        commands:
+          - "{{ cmd }}"
+      register: res
+
+    - name: results
+      debug:
+        var: res
+
+    - name: write to file
+      template:
+          src: "templates/savefile.j2"
+          dest: "files/{{ inventory_hostname }}.txt"
+      delegate_to: localhost
+

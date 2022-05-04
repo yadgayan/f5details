@@ -1,0 +1,5 @@
+[f5-taas]
+taasf5 10.76.96.25
+[f5-taas:vars]
+ansible_user=admin
+ansible_ssh_pass=$rU0Tkfif

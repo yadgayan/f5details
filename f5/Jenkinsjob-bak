@@ -1,0 +1,140 @@
+def container1 = 'mycon1'
+def container2 = 'mycon2'
+pipeline {
+   agent any
+   environment {
+        PMP_TOKEN = credentials('pmp_token')
+   }
+   stages {
+        stage('stash files') {
+            steps {    
+                stash name: "MyFiles", includes: "playbook.yml,inventory2.inv,ansible/**/*,template.j2"
+                stash name: "PythonReport", includes: "reportResults.py"
+            }
+        }
+        stage('Create docker in GNET') {
+            when { expression { params.Firewalls == 'firewalls-taas-asav-tstag' || params.Firewalls == 'firewalls-taas-asav-prod' } }
+            agent { label 'gnetwk_agent' }
+            options { skipDefaultCheckout() }
+	        stages {
+	            stage('build'){			
+					steps {
+                        echo "Chosen firewalls are ${Firewalls}"
+                        echo "Email address is ${Email}"
+			            sh "pwd" 
+						sh "docker ps"
+                        // sh "git status"             //Test git status 
+						sh "docker rm ${container1} -f || true"
+						sh "docker rm ${container2} -f || true"
+						sh "docker run -di --name ${container1} -e PMP_TOKEN=${PMP_TOKEN} harbor.sdp.net.nz/library/i-sdpbase"
+			//            sh "docker exec ${container1} ping -c 5 prtsvnfwl01-c01-gnetwk.svns.net.nz || true"
+					}
+				}
+                stage('Run ansible') {
+                    options { skipDefaultCheckout() }   
+                    steps {
+                        unstash name: "MyFiles"
+                        sh "mkdir auditfiles"
+                        sh "docker exec ${container1} mkdir auditfiles"
+                        sh "docker cp 'ansible' '${container1}:/app/ansible'"
+                        sh "docker cp 'inventory2.inv' '${container1}:/app/inventory2.inv'"
+                        sh "docker cp 'playbook.yml' '${container1}:/app/playbook.yml'"
+                        sh "docker cp 'template.j2' '${container1}:/app/template.j2'"
+                        sh "docker exec ${container1} ansible-playbook -i inventory2.inv playbook.yml --limit ${Firewalls}"
+                        sh "docker exec ${container1} ls -lt"
+                        sh "docker exec ${container1} ls -lt auditfiles"
+                        sh "docker cp '${container1}:/app/auditfiles/.' './auditfiles'"
+                        sh "ls -lt ./auditfiles"
+                        stash name: "tomaster", includes: "auditfiles/**/*"
+                    }
+                }
+			}
+            post { 
+                always { 
+                        sh "docker ps"
+                        sh "docker rm ${container1} -f"
+                }
+            }
+
+        }
+//###################################################################
+//###################################################################
+
+        stage('Create docker in CMN') {
+            when { expression { params.Firewalls == 'firewalls-taas-physical-gnet' } }
+            agent { label 'cmn_agent' }
+            options { skipDefaultCheckout() }
+	        stages {
+	            stage('build'){			
+					steps {
+                        echo "Chosen firewalls are ${Firewalls}"
+                        echo "Email address is ${Email}"
+			            sh "pwd" 
+						sh "docker ps"
+						sh "docker rm ${container1} -f || true"
+						sh "docker rm ${container2} -f || true"
+						sh "docker run -di --name ${container1} -e PMP_TOKEN=${PMP_TOKEN} harbor.sdp.net.nz/library/i-sdpbase"
+			//            sh "docker exec ${container1} ping -c 5 prtsvnfwl01-c01-gnetwk.svns.net.nz || true"
+					}
+				}
+                stage('Run ansible') {
+                    options { skipDefaultCheckout() }   
+                    steps {
+                        unstash name: "MyFiles"
+                        sh "mkdir auditfiles"
+                        sh "docker exec ${container1} mkdir auditfiles"
+                        sh "docker cp 'ansible' '${container1}:/app/ansible'"
+                        sh "docker cp 'inventory2.inv' '${container1}:/app/inventory2.inv'"
+                        sh "docker cp 'playbook.yml' '${container1}:/app/playbook.yml'"
+                        sh "docker cp 'template.j2' '${container1}:/app/template.j2'"
+                        sh "docker exec ${container1} ansible-playbook -i inventory2.inv playbook.yml --limit ${Firewalls}"
+                        sh "docker exec ${container1} ls -lt"
+                        sh "docker exec ${container1} ls -lt auditfiles"
+                        sh "docker cp '${container1}:/app/auditfiles/.' './auditfiles'"
+                        sh "ls -lt ./auditfiles"
+                        stash name: "tomaster", includes: "auditfiles/**/*"
+                    }
+                }
+			}
+            post { 
+                always { 
+                        sh "docker ps"
+                        sh "docker rm ${container1} -f"
+                }
+            }
+
+        }
+        stage('Reporting') {
+            options { skipDefaultCheckout() }   
+            stages {
+                stage('Email Files'){
+                    steps {
+                        unstash name: "PythonReport"
+                        unstash name: "tomaster"
+                        sh "docker run -di --name ${container2} -e PMP_TOKEN=${PMP_TOKEN} -e _EMAIL='${Email}' --dns 10.96.0.10 --dns-search default.svc.cluster.local --dns-search svc.cluster.local --dns-search cluster.local harbor.sdp.net.nz/library/i-sdpbase"
+            //            sh "ls -lt"
+                        sh "ls -lt ./auditfiles"
+            //            sh "cat ./auditfiles/report-TSTAG5ASA001.txt"
+                        sh "docker exec ${container2} ls -lt"
+                        sh "docker cp 'reportResults.py' '${container2}:/app/reportResults.py'"
+                        sh "docker cp 'auditfiles' '${container2}:/app/auditfiles'"
+                        sh "docker exec ${container2} ls -lt"
+                        sh "docker exec ${container2} python3 -u reportResults.py"
+            //            sh "docker rm ${container2} -f"
+                    }
+                }
+            }
+            post { 
+                always { 
+                        sh "docker ps"
+                        sh "docker rm ${container2} -f"
+                }
+            }      
+        } 
+   }
+   post { 
+       always { 
+             cleanWs()
+       }
+   }
+}

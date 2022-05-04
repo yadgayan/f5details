@@ -1,0 +1,38 @@
+---
+
+- hosts: f5-taas
+  gather_facts: false
+  connection: local
+
+  vars:
+    command_list:
+        - show sys clock
+        - list /ltm data-group internal DG_INREWN_HTTS001_Valid_Cert_CName
+  tasks:
+  - name: Run command
+    bigip_command:
+      provider:
+          server: taasf5
+          user: "{{ ansible_user }}"
+          password: "{{ ansible_ssh_pass }}"
+          server_port: 443
+          validate_certs: false
+      commands: "{{ command_list }}"
+
+      chdir: B_4999
+    register: result
+
+  - debug: msg="{{result.stdout_lines}}"
+
+#  - name: copy the output to a local file
+#    copy:
+#      content: "{{ result.stdout[0] }}"
+#      dest: "/tmp/F5_details.txt"
+
+#    loop: "{{command_list}}"
+#    delegate_to: localhost
+
+  - name: "Put all output together into one nice text file"
+    template:
+        src: template.j2
+        dest: "auditfiles/report-{{ inventory_hostname }}.txt"

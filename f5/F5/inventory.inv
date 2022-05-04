@@ -1,0 +1,8 @@
+[f5-taas]
+taasf5 10.76.96.25
+PRTCORLBS04
+[f5-taas:vars]
+#ansible_user=svc-cpa-ansible-taas
+#ansible_ssh_pass="{{ lookup('getpmppassword','ansible_res', 'svc-cpa-ansible-taas')}}"
+ansible_user=admin
+ansible_ssh_pass=$rU0Tkfif
