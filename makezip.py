@@ -18,7 +18,7 @@ def main():
     #create a ZipFile object
     zipObj = ZipFile('/tmp/sample.zip', 'w')
     # Add multiple files to the zip
-    zipObj.write('/tmp/F5_details.txt')
+    zipObj.write('F5_details.txt')
     
     # close the Zip File
     zipObj.close()
