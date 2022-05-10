@@ -16,7 +16,7 @@ def zipFilesInDir(dirName, zipFileName, filter):
 def main():
     print('*** Create a zip file from multiple files  ')
     #create a ZipFile object
-    zipObj = ZipFile('sample.zip', 'w')
+    zipObj = ZipFile('/tmp/sample.zip', 'w')
     # Add multiple files to the zip
     zipObj.write('/tmp/F5_details.txt')
     
