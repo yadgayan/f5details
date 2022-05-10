@@ -26,8 +26,9 @@
 #        - list /ltm data-group internal CName_DG499
       chdir: B_3333
     register: result
-
-  - debug: msg="{{result.stdout_lines}}"
+  - name: Check Stuff
+    debug: 
+      msg: "{{result.stdout_lines}}"
 
 #  - name: copy the output to a local file
 #    copy:
