@@ -17,9 +17,10 @@ def main():
     print('*** Create a zip file from multiple files  ')
     #create a ZipFile object
     zipObj = ZipFile('/tmp/sample.zip', 'w')
-    zf.setpassword(b"1234")
+    
     # Add multiple files to the zip
     zipObj.write('/tmp/F5_details.txt')
+    zipObj.setpassword(b"1234")
     
     # close the Zip File
     zipObj.close()
