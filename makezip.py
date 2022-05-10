@@ -33,7 +33,7 @@ def main():
     pre = None
 
       # output zip file path
-    oupt = "/tmp/sample.zip"
+    oupt = "/tmp/sample2.zip"
 
       # set password value
     password = "GFG"
