@@ -20,10 +20,11 @@ def main():
     
     # Add multiple files to the zip
     zipObj.write('/tmp/F5_details.txt')
-    zipObj.setpassword(b"1234")
+    
     
     # close the Zip File
     zipObj.close()
+    zipObj.setpassword(b"1234")
  
 
 if __name__ == '__main__':
