@@ -1,3 +1,4 @@
+import pyminizip
 from zipfile import ZipFile
 import os
 from os.path import basename
