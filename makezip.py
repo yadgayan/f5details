@@ -1,5 +1,4 @@
 from zipfile import ZipFile
-import pyminizip
 import os
 from os.path import basename
 # Zip the files from given directory that matches the filter
@@ -25,24 +24,7 @@ def main():
     
     # close the Zip File
     zipObj.close()
-    
-     # input file path
-    inpt = "'/tmp/F5_details.txt"
-  
-      # prefix path
-    pre = None
 
-      # output zip file path
-    oupt = "/tmp/sample2.zip"
-
-      # set password value
-    password = "GFG"
-
-      # compress level
-    com_lvl = 5
-
-      # compressing file
-    pyminizip.compress(inpt, None, oupt,password, com_lvl)
  
 
 if __name__ == '__main__':
