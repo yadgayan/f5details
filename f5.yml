@@ -38,5 +38,10 @@
       dest: /tmp/report-test.zip
       format: zip
       remove: true
+      
+  - name: set pw
+    ansible.builtin.shell:
+      cmd: zip --password 11 /tmp/test.zip /tmp/report-test.zip
+      cmd: ls -l
 
 
