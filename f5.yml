@@ -38,11 +38,4 @@
       dest: /tmp/report-test.zip
       format: zip
 
-  - name: Vault encrypt a given file
-    vars:
-      vault_pass: v3rys3cur3
-      expect:
-         command: ansible-vault encrypt --ask-vault-pass /tmp/F5_details.txt
-         responses:
-           New Vault password: "{{ vault_pass }}"
-           Confirm New Vault password: "{{ vault_pass }}"
+
