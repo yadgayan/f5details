@@ -37,5 +37,6 @@
       path: /tmp/F5_details.txt
       dest: /tmp/report-test.zip
       format: zip
+      remove: true
 
 
