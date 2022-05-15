@@ -1,21 +1,22 @@
 ---
 
-- name: F5 update list
+- name: F5- Update Cname List
   hosts: f5taas
   connection: local
   gather_facts: false
 
   vars:
-    command_list:
- #       - show sys version
-        - show sys clock
-        - list /ltm data-group internal DG_INREWN_HTTS001_Valid_Cert_CName
+    cname_list:
+        - DG_INREWN_HTTS001_Valid_Cert_CName
+        - Blsss
+        - Another list name
 
   tasks:
     
   - name: Update an existing external data group of strings
     bigip_data_group:
-      name: DG_INREWN_HTTS001_Valid_Cert_CName
+      chdir: B_4999
+      name: "{{ cname_list }}"
       external: yes
       records:
         - key: bla bala
