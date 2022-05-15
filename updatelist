@@ -1,0 +1,34 @@
+---
+
+- name: F5 update list
+  hosts: f5taas
+  connection: local
+  gather_facts: false
+
+  vars:
+    command_list:
+ #       - show sys version
+        - show sys clock
+        - list /ltm data-group internal DG_INREWN_HTTS001_Valid_Cert_CName
+
+  tasks:
+    
+  - name: Update an existing external data group of strings
+    bigip_data_group:
+      name: DG_INREWN_HTTS001_Valid_Cert_CName
+      external: yes
+      records:
+        - key: bla bala
+          value: "test bla"
+        - key: blaaaaaaaaaaaaa
+          value: "testt balaaa"
+      provider:
+        password: password: "{{ _PASSWD }}"
+        server: prtcorlbs03.svns.net.nz
+        user: "{{ _USER }}"
+        transport: cli
+    delegate_to: localhost
+
+    register: result
+  - debug: msg="{{result.stdout_lines}}"
+    delegate_to: localhost
