@@ -23,7 +23,7 @@
         - key: blaaaaaaaaaaaaa
           value: "testt balaaa"
       provider:
-        password: password: "{{ ansible_password }}"
+        password: "{{ ansible_password }}"
         server: myf5
         user: "{{ ansible_user }}"
         transport: cli
