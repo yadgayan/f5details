@@ -1,7 +1,7 @@
 ---
 
 - name: F5- Update Cname List
-  hosts: f5taas
+  hosts: F5
   connection: local
   gather_facts: false
 
@@ -24,7 +24,7 @@
           value: "testt balaaa"
       provider:
         password: password: "{{ ansible_password }}"
-        server: prtcorlbs03.svns.net.nz
+        server: myf5
         user: "{{ ansible_user }}"
         transport: cli
     delegate_to: localhost
