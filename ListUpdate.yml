@@ -14,9 +14,9 @@
     
   - name: Update an existing external data group of strings
     bigip_data_group:
-      chdir: B_3999
+      partition: B_3999
       name: "{{ cname_list }}"
-      external: yes
+      internal: no
       records:
         - key: bla bala
           value: "test bla"
