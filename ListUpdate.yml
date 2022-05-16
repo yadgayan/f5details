@@ -7,15 +7,14 @@
 
   vars:
     cname_list:
-        - DG_INREWN_HTTS001_Valid_Cert_CName
-        - Blsss
-        - Another list name
+        - CName_DG499
+
 
   tasks:
     
   - name: Update an existing external data group of strings
     bigip_data_group:
-      chdir: B_4999
+      chdir: B_3999
       name: "{{ cname_list }}"
       external: yes
       records:
