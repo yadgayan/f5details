@@ -23,9 +23,9 @@
         - key: blaaaaaaaaaaaaa
           value: "testt balaaa"
       provider:
-        password: password: "{{ _PASSWD }}"
+        password: password: "{{ ansible_password }}"
         server: prtcorlbs03.svns.net.nz
-        user: "{{ _USER }}"
+        user: "{{ ansible_user }}"
         transport: cli
     delegate_to: localhost
 
