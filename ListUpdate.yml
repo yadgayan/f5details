@@ -12,22 +12,23 @@
 
   tasks:
     
-  - name: Update an existing external data group of strings
+  - name: Update an existing internal data group of strings
     bigip_data_group:
-      partition: B_3999
-      name: "{{ cname_list }}"
-      internal: no
+      name: portal-pool-wasp-8000_dg
+      internal: yes
       records:
-        - key: bla bala
-          value: "test bla"
-        - key: blaaaaaaaaaaaaa
-          value: "testt balaaa"
+        - key: caddy
+          value: "fddfd"
+        - key: cafeteria
+          value: "ddf"
+        - key: cactus
+          value: "dfdfd"
       provider:
         password: "{{ ansible_password }}"
         server: myf5
         user: "{{ ansible_user }}"
  #       transport: cli
-    delegate_to: localhost
+      delegate_to: localhost
 
     register: result
   - debug: msg="{{result.stdout_lines}}"
