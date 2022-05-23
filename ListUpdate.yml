@@ -14,7 +14,7 @@
     
   - name: Update an existing internal data group of strings
     bigip_data_group:
-      name: portal-pool-wasp-8000_dg
+      name: CName_DG499
       internal: yes
       records:
         - key: caddy
