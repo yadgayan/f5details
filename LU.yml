@@ -1,0 +1,28 @@
+---
+
+- name: Configuring LBs including hypervisors and vCMP guests
+  hosts: F5
+  connection: local
+  gather_facts: False
+
+
+
+  vars:
+    provider:
+      password: Auckland@123
+      server: myf5
+      user: test
+      validate_certs: no
+      server_port: 443
+
+  tasks:
+    - name: Configure data groups on masters
+      bigip_data_group:
+        partition: "B_3333"
+        name: "CName_DG499"
+        records_src: /home/gayan/dg.txt
+        type: "string"
+        internal: "yes"
+         
+        state: present
+        provider: "{{ provider }}"
