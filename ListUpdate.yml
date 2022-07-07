@@ -1,0 +1,110 @@
+---
+
+- name: Configuring LBs including hypervisors and vCMP guests
+  hosts: F5
+  connection: local
+  gather_facts: False
+
+  vars:
+    provider:
+      password: Auckland@123
+      server: myf5
+      user: test
+      validate_certs: no
+      server_port: 443
+      
+    command_list:
+        - show sys version
+        - list /ltm data-group internal CName_DG499    
+      
+  tasks:
+  - name: Get existing cname list
+    bigip_command:
+      provider: "{{ provider }}"
+      commands: "{{ command_list }}"
+      chdir: B_3333
+    register: result
+
+  - debug: msg="{{result.stdout_lines}}"  
+  
+  - name: "Put all output together into one nice text file"
+    template:
+        src: template.j2
+        dest: "/tmp/F5_old.txt"  
+   
+  
+  - name: Configure data groups on masters CName_DG499
+    bigip_data_group:
+      partition: "B_3333"
+      name: CName_DG499
+      records_src: /tmp/dg.txt
+      type: "string"
+      internal: "yes"       
+      state: present
+      provider: "{{ provider }}"
+  
+  - name: Configure data groups on masters CName_DG450
+    bigip_data_group:
+      partition: "B_3333"
+      name: CName_DG450
+      records_src: /tmp/dg.txt
+      type: "string"
+      internal: "yes"       
+      state: present
+      provider: "{{ provider }}"
+    
+  - name: Configure data groups on masters CName_DG451
+    bigip_data_group:
+      partition: "B_3333"
+      name: CName_DG451
+      records_src: /tmp/dg.txt
+      type: "string"
+      internal: "yes"       
+      state: present
+      provider: "{{ provider }}"
+      
+  - name: Configure data groups on masters CName_DG452
+    bigip_data_group:
+      partition: "B_3333"
+      name: CName_DG452
+      records_src: /tmp/dg.txt
+      type: "string"
+      internal: "yes"       
+      state: present
+      provider: "{{ provider }}"
+      
+  - name: Get New cname list
+    bigip_command:
+      provider: "{{ provider }}"
+      commands: "{{ command_list }}"
+      chdir: B_3333
+    register: result2
+
+  - debug: msg="{{result2.stdout_lines}}"  
+  
+  - name: "Put all output together into one nice text file"
+    template:
+        src: template2.j2
+        dest: "/tmp/F5_new.txt"  
+  
+  - name: "Only show diff between cname files" 
+    command: diff /tmp/F5_old.txt /tmp/F5_new.txt
+    failed_when: "diff.rc > 1"
+    register: diff
+    
+  - debug: var=diff.stdout_lines
+   
+    
+#  - name: "Put all output together into one nice text file"
+#    copy:
+#       content: "{{ diff.stdout }}"
+#       dest: "/tmp/Change_details.txt"
+       
+  - name: "Put diff to text file"
+    template:
+        src: template3.j2
+        dest: "/tmp/Change_details.txt"
+
+
+
+ 
