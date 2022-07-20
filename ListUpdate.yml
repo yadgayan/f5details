@@ -33,11 +33,11 @@
         dest: "/tmp/F5_old.txt"  
    
   
-  - name: Configure data groups on masters CName_DG499
+  - name: Configure data groups on masters CName_DG450
     bigip_data_group:
-      partition: "B_3333"
-      name: CName_DG499
-      records_src: /tmp/dg.txt
+      partition: "A_4444"
+      name: CName_DG450
+      records_src: /tmp/dg1.txt
       type: "string"
       internal: "yes"       
       state: present
