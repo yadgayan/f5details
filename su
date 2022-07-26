@@ -1,0 +1,107 @@
+---
+
+- name: Configuring LBs including hypervisors and vCMP guests
+  hosts: F5
+  connection: local
+  gather_facts: False
+
+  vars:
+    provider:
+      password: Auckland@123
+      server: 192.168.1.32
+      user: test
+      validate_certs: no
+      server_port: 443
+      
+    command_list:
+        - show sys version
+        - list /ltm data-group internal CNAME_HTTP_001    
+      
+  tasks:
+  - name: Run command
+    bigip_command:
+      provider:
+          server: 192.168.1.32
+          user: "{{ ansible_user }}"
+          password: "{{ ansible_password }}"
+          server_port: 443
+          validate_certs: false
+      commands: "{{ command_list }}"
+
+      chdir: A_4999
+    register: result
+  - name: Check Stuff
+    debug: 
+      msg: "{{result.stdout_lines}}"
+
+  - name: "Put all output together into one nice text file"
+    template:
+        src: template.j2
+        dest: "/tmp/F5_old.txt"
+   
+  
+  - name: Configure data groups on masters CNAME_HTTP_001
+    bigip_data_group:
+      partition: "A_4999"
+      name: CNAME_HTTP_001
+      records_src: /tmp/dg1.txt
+      type: "string"
+      internal: "yes"       
+      state: present
+      provider: "{{ provider }}"
+  
+      
+  - name: Get New cname list
+    bigip_command:
+      provider:
+          server: 192.168.1.32
+          user: "{{ ansible_user }}"
+          password: "{{ ansible_password }}"
+          server_port: 443
+          validate_certs: false
+      commands: "{{ command_list }}"
+
+      chdir: A_4999
+    register: result
+  - name: Check Stuff
+    debug: 
+      msg: "{{result.stdout_lines}}"
+
+  - name: "Put all output together into one nice text file"
+    template:
+        src: template.j2
+        dest: "/tmp/F5_new.txt" 
+  
+  - name: "Only show diff between cname files" 
+    command: diff /tmp/F5_old.txt /tmp/F5_new.txt
+    failed_when: "diff.rc > 1"
+    register: diff
+    
+  - debug: var=diff.stdout_lines
+   
+  - name: Sync configuration from most recent device to the current host
+    bigip_configsync_action:
+      device_group: DG_1_2
+#      sync_most_recent_to_device: yes
+      sync_device_to_group: yes
+      provider:
+          server: 192.168.1.32
+          user: "{{ ansible_user }}"
+          password: "{{ ansible_password }}"
+          server_port: 443
+          validate_certs: false
+#      server: 192.168.1.32
+#      user: test	
+#      password: Auckland@123
+#      validate_certs: no
+#    delegate_to: localhost
+    
+#  - name: "Put all output together into one nice text file"
+#    copy:
+#       content: "{{ diff.stdout }}"
+#       dest: "/tmp/Change_details.txt"
+       
+#  - name: "Put diff to text file"
+#    template:
+#        src: template3.j2
+#        dest: "/tmp/Change_details.txt"
