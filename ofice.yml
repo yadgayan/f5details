@@ -1,0 +1,107 @@
+---
+
+- name: Wohooo we are starting Update CNAME in P_4999 XZT (test1) env
+  hosts: f5taas-p
+  connection: local
+  gather_facts: False
+
+  vars:
+    provider:
+      password: "{{ _PASSWD }}"
+      server: artcorlbs03.svns.net.nz
+      user: "{{ _USER }}"
+
+    command_list:
+        - show sys version
+        - list /ltm data-group internal DG_INREWN_HTTS008_Valid_Cert_CName    
+      
+  tasks:
+  - name: Get existing cname list
+    bigip_command:
+      commands: "{{ command_list }}"
+      chdir: P_4999
+      provider:
+        server: artcorlbs03.svns.net.nz
+        user: "{{ _USER }}"      
+        password: "{{ _PASSWD }}"
+        transport: cli
+    register: result
+
+  - debug: msg="{{result.stdout_lines}}"  
+  
+  - name: "Put all output together into one nice text file"
+    template:
+        src: LU.j2
+        dest: "auditfiles/OLD_XZT.txt"  
+   
+  - name: Updatet data group list-  NZT- DG_INREWN_HTTS008_Valid_Cert_CName 
+    bigip_data_group:
+      partition: "P_4999"
+      name: DG_INREWN_HTTS008_Valid_Cert_CName
+      records_src: CNAME_List/XZT.txt
+      type: "string"
+      internal: "yes"       
+      state: present
+      provider:
+        password: "{{ _PASSWD }}"
+        server: artcorlbs03.svns.net.nz
+        user: "{{ _USER }}"   
+        validate_certs: no
+        server_port: 443
+
+
+  
+  - name: Get updated CNAME values from DG_INREWN_HTTS001_Valid_Cert_CName 
+    bigip_command:
+      commands: "{{ command_list }}"
+      chdir: P_4999
+      provider:
+        server: artcorlbs03.svns.net.nz
+        user: "{{ _USER }}"      
+        password: "{{ _PASSWD }}"
+        transport: cli
+    register: result2
+
+  - debug: msg="{{result2.stdout_lines}}"  
+  
+  - name: "Put all output together into one nice text file"
+    template:
+        src: newresults.j2
+        dest: "auditfiles/NEW_XZT.txt"  
+  
+  - name: "Only show diff between cname files" 
+    command: diff auditfiles/OLD_XZT.txt auditfiles/NEW_XZT.txt
+    failed_when: "diff.rc > 1"
+    register: diff
+    
+  - debug: var=diff.stdout_lines
+              
+  - name: "Put diff to text file"
+    template:
+        src: diff.j2
+        dest: "auditfiles/Change_details.txt"
+    
+#  - name: Sync configuration from device to group.
+#    bigip_configsync_action:
+#      device_group: DG_1_2
+#      sync_device_to_group: yes
+#      provider:
+#          server: artcorlbs03.svns.net.nz
+#          user: "{{ _USER }}"
+#          password: "{{ _PASSWD }}"
+#          server_port: 443
+#          validate_certs: false
+
+#  - name: Sync configuration from device to group
+#    bigip_configsync_action:
+#      device_group: device-group-failover-c91a8d1bf8f3 
+#      sync_device_to_group: yes
+#      server: lb.mydomain.com
+#      user: admin
+#      password: secret
+#      validate_certs: no
+#    delegate_to: localhost
+
+
+
+ 
